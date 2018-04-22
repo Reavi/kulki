@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport"  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+	<link rel="Stylesheet" href="css/main.css" />
+	<script src="js/BoardRenderer.js"></script>
+	<script src="js/BoardModel.js"></script>
+	<script src="js/Game.js"></script>
+	<script src="js/Ulepszenia.js"></script>
+
+	<script>
+		
+		
+		function start_gry()
+		{
+		ukryj_niepotrzebne();
+		pokaz_potrzebne();
+		sprawdz_kolory();
+		init();
+		}
+		
+		function init() {
+			var canvas = initFullScreenCanvas("mainCanvas");
+			game = new Game(canvas);
+
+			if (isTouchDevice()) {
+				canvas.addEventListener("touchstart", function(e) {
+					var touch = event.targetTouches[0];
+					game.handleClick(touch.pageX, touch.pageY);
+					e.stopPropagation();
+					e.preventDefault();
+				}, false);
+			} else {
+				canvas.addEventListener("mouseup", function(e) {
+					game.handleClick(e.pageX, e.pageY);
+					e.stopPropagation();
+					e.preventDefault();
+				}, false);
+			}
+		}
+
+		function initFullScreenCanvas(canvasId) {
+			var canvas = document.getElementById(canvasId);
+			resizeCanvas(canvas);
+			window.addEventListener("resize", function() {
+				resizeCanvas(canvas);
+			});
+			return canvas;
+		}
+
+		function resizeCanvas(canvas) {
+			canvas.width  = document.width || document.body.clientWidth;
+			canvas.height = document.height*0.8 || document.body.clientHeight*0.8;
+			game && game.handleResize();
+		}
+
+		function isTouchDevice() {
+			return ('ontouchstart' in document.documentElement);
+		}
+
+	</script>
+</head>
+<body >
+
+<div id="box_menu">
+<h1 style="text-align:center;">Gra w Kulki</h1>
+<input type="button" onclick="start_gry()" value="Start">
+<div class="lh" id="lh">
+<form name="ilosc_graczy_f">
+Wybierz ilość graczy:</br>
+<select id="select0" name="ilosc_graczy_select" onchange="ilosc_graczy_s()" onclick="zmiana_disable(0)" class="wybory"> 
+<option value="0" selected>Kliknij tutaj..</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+</select></br>
+Typ gry:</br>
+<select id="select_typ_gry" name="selec_typ_gry" onchange="zmien_typ_gry()"  class="wybory"> 
+<option value="0" selected>Normalny</option>
+<option value="2" >Do ostatniego zwycięstwa</option>
+
+</select></br>
+Ilość kulek do zwycięstwa:</br>
+<select id="select_ilosc_kulek" name="select_ilosc_kulek" onchange="zmien_ilosc_kulek()"  class="wybory"> 
+<option value="4" selected>4</option>
+<option value="3">3</option>
+<option value="2">2</option>
+<option value="5">5</option>
+<option value="6">6</option>
+</select></br>
+Wielkość planszy:</br><select id="select_wielkosc_planszy" name="select_wielkosc_planszy" onchange="zmien_wielkosc_planszy()"  class="wybory"> 
+<option value="2" selected>Średnia</option>
+<option value="3">Duża</option>
+<option value="1">Mała</option>
+</select>
+</form>
+</div>
+
+<div class="rh" id="rh">
+<form name='ilosc' id="formularz_kolorow">
+<kk id="kolor1" style="visibility:hidden;">
+Kolor gracza pierwszego:<select name="wyborkol1" onchange="kolor_g(1)" id="select1" onclick="zmiana_disable(1)" class="wybory" >
+<option value="0">Kliknij tutaj..</option>
+<option value='red'>czerwony</option>
+<option value='green'>zielony</option>
+<option value='blue'>niebieski</option>
+<option value='purple'>fioletowy</option>
+<option value='gray'>szary</option>
+<option value='brown'>brazowy</option>
+<option value='black'>czarny</option>
+</select><br>
+</kk>
+<kk id="kolor2" style="visibility:hidden;">
+Kolor gracza drugiego:<select name="wyborkol2" onchange="kolor_g(2)" class="wybory" id="select2" onclick="zmiana_disable(2)" >
+<option value="0">Kliknij tutaj..</option>
+<option value='red'>czerwony</option>
+<option value='green'>zielony</option>
+<option value='blue'>niebieski</option>
+<option value='purple'>fioletowy</option>
+<option value='gray'>szary</option>
+<option value='brown'>brazowy</option>
+<option value='black'>czarny</option>
+</select><br>
+</kk>
+<kk id="kolor3" style="visibility:hidden;">
+Kolor gracza trzeciego:<select name="wyborkol3" onchange="kolor_g(3)" class="wybory" id="select3" onclick="zmiana_disable(3)" >
+<option value="0">Kliknij tutaj..</option>
+<option value='red'>czerwony</option>
+<option value='green'>zielony</option>
+<option value='blue'>niebieski</option>
+<option value='purple'>fioletowy</option>
+<option value='gray'>szary</option>
+<option value='brown'>brazowy</option>
+<option value='black'>czarny</option>
+</select><br>
+</kk>
+<kk id="kolor4" style="visibility:hidden;">
+Kolor gracza czwartego:
+<select name='wyborc' type="hidden" onchange="kolor_g(4)" class="wybory" id="select4" onclick="zmiana_disable(4)" >
+<option value="0">Kliknij tutaj..</option>
+<option value='red'>czerwony</option>
+<option value='green'>zielony</option>
+<option value='blue'>niebieski</option>
+<option value='purple'>fioletowy</option>
+<option value='gray'>szary</option>
+<option value='brown'>brazowy</option>
+<option value='black'>czarny</option>
+</select></kk><br>
+<kk id="kolor5" style="visibility:hidden;">
+Kolor gracza Piątego:
+<select name='wyborp' type="hidden" onchange="kolor_g(5)" class="wybory" id="select5" onclick="zmiana_disable(5)" >
+<option value="0">Kliknij tutaj..</option>
+<option value='red'>czerwony</option>
+<option value='green'>zielony</option>
+<option value='blue'>niebieski</option>
+<option value='purple'>fioletowy</option>
+<option value='gray'>szary</option>
+<option value='brown'>brazowy</option>
+<option value='black'>czarny</option>
+</select></kk><br>
+<kk id="kolor6" style="visibility:hidden;">
+Kolor gracza Szóstego:
+<select name='wyborsz' type="hidden" onchange="kolor_g(6)" class="wybory" id="select6" onclick="zmiana_disable(6)" >
+<option value="0">Kliknij tutaj..</option>
+<option value='red'>czerwony</option>
+<option value='green'>zielony</option>
+<option value='blue'>niebieski</option>
+<option value='purple'>fioletowy</option>
+<option value='gray'>szary</option>
+<option value='brown'>brazowy</option>
+<option value='black'>czarny</option>
+</select></kk>
+<kk id="przycisk" style="visibility:hidden;">
+
+</kk>
+</br>
+</form>
+</div>
+<div>
+</br>
+<h3>Jak grać?</h3>
+Gra polega na układaniu kulek w rzędzie. Gracz układa po dwie (lub więcej) kulek o tym samym kolorze w rzędzie (poziomo, pionowo, bądź po skosie). Gracz może postawić kulkę tylko na istniejącej kulce lub na podstawie planszy.
+</br>
+</br>
+<span style="font-size:12px;">Uruchomienie gry bez ustawień parametrów, uruchomi grę w trybie domyślnym(2 graczy z domyślnymi kolorami,4 kulki do zwycięstwa,średnia plansza).</span>
+</div>
+</div>
+
+
+
+
+
+
+
+
+<div class="ag" id="agp" style="visibility:hidden;">
+Aktualnie ruch wykonuje gracz: <ag id="ag">Pierwszy</ag>
+</br>
+<div id="wyniki" style="visibility:hidden; float:right; font-size:25px;">
+<table>
+<tr>
+	<td>Gracz 1</td><td>Gracz 2</td><td>Gracz 3</td><td>Gracz 4</td><td>Gracz 5</td><td>Gracz 6</td>
+</tr>
+<tr>
+	<td><span id="wynikgracz1">0</span></td><td><span id="wynikgracz2">0</span></td><td><w id="wynikgracz3">0</w></td><td id="wynikgracz4">0</td><td id="wynikgracz5">0</td><td id="wynikgracz6">0</td>
+</tr>
+
+
+</table>
+</div>
+<input type="button" value="Reset" onClick="window.location.reload()">
+
+</div>
+
+<div>
+<canvas id="mainCanvas" width="100" height="100"></canvas>
+</div>
+
+</body>
+</html>
